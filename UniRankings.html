@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>University Ranking Methodology — Accurate Comparator</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg:       #f5f2eb;
+  --ink:      #1a1612;
+  --ink2:     #4a4540;
+  --rule:     rgba(26,22,18,.12);
+  --rule2:    rgba(26,22,18,.06);
+  --cream:    #ede9e0;
+  --parchment:#e8e3d8;
+
+  /* Concept palette — warm editorial */
+  --c-research:      #1a3a5c;
+  --c-research-bg:   #dce8f2;
+  --c-teaching:      #5a3e6b;
+  --c-teaching-bg:   #c7afc3;
+  --c-prestige:      #6b2d00;
+  --c-prestige-bg:   #f5e0ce;
+  --c-employ:        #7a1f2e;
+  --c-employ-bg:     #f5d8dc;
+  --c-intl:          #0f4a4a;
+  --c-intl-bg:       #cdeaea;
+  --c-industry:      #4a3000;
+  --c-industry-bg:   #f0e4c0;
+  --c-other:         #3a3a3a;
+  --c-other-bg:      #e8e8e8;
+  --c-zero:          #888;
+  --c-zero-bg:       #f0f0f0;
+
+  /* Segment colours by ranking-indicator */
+  /* ARWU */
+  --arwu-alumni:  #8b3a6e;
+  --arwu-award:   #c4541d;
+  --arwu-hici:    #1a5c8a;
+  --arwu-ns:      #1a6b4a;
+  --arwu-pub:     #4a6b1a;
+  --arwu-pcp:     #6b6b6b;
+  /* QS */
+  --qs-res:      #1a3a7a;
+  --qs-emp:      #8a1a2a;
+  --qs-glob:     #0a5a5a;
+  --qs-learn:    #2a6a1a;
+  --qs-sus:      #5a6a1a;
+  /* THE */
+  --the-rq:      #1a2a6a;
+  --the-re:      #4a1a7a;
+  --the-teach:   #1a5a2a;
+  --the-intl:    #0a4a4a;
+  --the-ind:     #7a2a1a;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* ── MASTHEAD ─────────────────────────────────────────── */
+.masthead {
+  border-bottom: 2px solid var(--ink);
+  padding: 28px 40px 22px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: end;
+  background: var(--bg);
+}
+.masthead-left {}
+.eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--ink2);
+  margin-bottom: 6px;
+}
+.masthead h1 {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: clamp(26px, 3.5vw, 46px);
+  letter-spacing: -.02em;
+  line-height: 1.0;
+}
+.masthead-sub {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--ink2);
+  max-width: 620px;
+  line-height: 1.5;
+}
+.masthead-meta {
+  text-align: right;
+  font-size: 11px;
+  color: var(--ink2);
+  line-height: 1.7;
+  border-left: 1px solid var(--rule);
+  padding-left: 24px;
+}
+.masthead-meta strong { color: var(--ink); font-weight: 600; }
+
+/* ── ACCURACY NOTICE ───────────────────────────────────── */
+.accuracy-bar {
+  background: #1a3a5c;
+  color: #d0e8f8;
+  font-size: 11.5px;
+  padding: 10px 40px;
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.accuracy-bar .ab-tag {
+  background: rgba(255,255,255,.15);
+  border-radius: 3px;
+  padding: 2px 7px;
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.accuracy-bar .ab-item { display: flex; align-items: center; gap: 6px; }
+
+/* ── MAIN LAYOUT ───────────────────────────────────────── */
+.shell {
+  display: grid;
+  grid-template-columns: minmax(0,1.15fr) minmax(320px,.85fr);
+  gap: 0;
+  min-height: calc(100vh - 120px);
+}
+
+/* ── LEFT: MATRIX ─────────────────────────────────────── */
+.matrix-panel {
+  border-right: 1px solid var(--rule);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-header {
+  padding: 18px 28px 14px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.panel-header h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 17px;
+  letter-spacing: -.01em;
+}
+.panel-header p {
+  font-size: 11.5px;
+  color: var(--ink2);
+}
+
+/* ── CONCEPT TABS ─────────────────────────────────────── */
+.concept-strip {
+  padding: 12px 28px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--cream);
+}
+.concept-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink2);
+  margin-bottom: 8px;
+}
+.concept-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ctab {
+  border: 1px solid rgba(26,22,18,.25);
+  background: white;
+  color: var(--ink2);
+  border-radius: 3px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: .01em;
+  font-family: 'Instrument Sans', sans-serif;
+  transition: all .14s ease;
+  white-space: nowrap;
+}
+.ctab:hover { border-color: var(--ink); color: var(--ink); }
+.ctab.active { border-color: var(--ink); background: var(--ink); color: var(--bg); }
+
+.ctab[data-c="reputation_survey"].active {
+  background: var(--c-prestige);
+  border-color: var(--c-prestige);
+  color: #fff;
+}
+.ctab[data-c="university_submission"].active {
+  background: var(--c-teaching);
+  border-color: var(--c-teaching);
+  color: #fff;
+}
+.ctab[data-c="bibliometrics_database"].active {
+  background: var(--c-research);
+  border-color: var(--c-research);
+  color: #fff;
+}
+.ctab[data-c="third_party"].active {
+  background: var(--c-industry);
+  border-color: var(--c-industry);
+  color: #fff;
+}
+/* In-house Database removed */
+
+/* ── THREE-COLUMN STACKED BARS ──────────────────────────── */
+.bars-area {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 0;
+}
+
+.ranking-col {
+  border-right: 1px solid var(--rule2);
+  display: flex;
+  flex-direction: column;
+}
+.ranking-col:last-child { border-right: none; }
+
+.col-head {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--rule2);
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 2;
+}
+.col-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  letter-spacing: -.03em;
+}
+.col-sub {
+  font-size: 10.5px;
+  color: var(--ink2);
+  margin-top: 2px;
+  font-family: 'DM Mono', monospace;
+}
+
+.stack {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 580px;
+}
+
+.seg {
+  position: relative;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,.18);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8px 12px;
+  overflow: hidden;
+  transition: filter .13s ease, opacity .13s ease, box-shadow .13s ease, outline .13s ease;
+  min-height: 28px;
+}
+.seg:last-child { border-bottom: none; }
+
+/* zero-weight segments get a stripe pattern overlay */
+.seg.zero-weight {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 4px,
+    rgba(0,0,0,.08) 4px,
+    rgba(0,0,0,.08) 8px
+  ) !important;
+}
+
+.seg-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255,255,255,.95);
+  text-shadow: 0 1px 3px rgba(0,0,0,.3);
+  line-height: 1.2;
+  position: relative;
+  z-index: 1;
+}
+.seg-wt {
+  font-size: 14px;
+  font-family: 'DM Mono', monospace;
+  color: rgba(255,255,255,.8);
+  margin-top: 2px;
+  position: relative;
+  z-index: 1;
+}
+.seg-flag {
+  position: absolute;
+  top: 4px;
+  right: 5px;
+  font-size: 9px;
+  background: rgba(0,0,0,.22);
+  color: rgba(255,255,255,.9);
+  border-radius: 2px;
+  padding: 1px 4px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+/* concept tags on segments */
+.seg-concepts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 4px;
+  position: relative;
+  z-index: 1;
+}
+.seg-ctag {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  opacity: .85;
+}
+
+/* Compact mode for very short segments: place label and weight on one line */
+.seg.compact {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+}
+.seg.compact .seg-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px; /* slightly smaller in compact */
+}
+.seg.compact .seg-wt {
+  margin-left: auto;
+  font-size: 11px;
+}
+
+.seg.compact .seg-compact-text {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-weight: 700;
+  color: rgba(255,255,255,.95);
+  text-shadow: 0 1px 3px rgba(0,0,0,.3);
+}
+
+/* highlight states */
+.seg.dim    { opacity: .18; filter: grayscale(.6); }
+.seg.lit    { outline: 2.5px solid rgba(255,255,255,.85); outline-offset: -2px; z-index: 2; }
+.seg.chosen { outline: 3px solid var(--ink); outline-offset: -3px; z-index: 3;
+              box-shadow: 0 0 0 5px rgba(26,22,18,.1); }
+
+/* strict many-to-many cross-highlighting states */
+.seg.cross-highlight {
+  opacity: 1;
+  filter: none;
+  z-index: 3;
+  box-shadow:
+    inset 0 0 0 3px rgba(255,255,255,.94),
+    inset 0 0 20px rgba(255,255,255,.32);
+}
+
+.seg.dimmed {
+  opacity: .16;
+  filter: grayscale(.9) saturate(.25) brightness(.82);
+}
+
+.seg.hovered-seg {
+  opacity: 1;
+  filter: none;
+  z-index: 4;
+  outline: 2.5px solid rgba(255,255,255,.98);
+  outline-offset: -2px;
+  box-shadow:
+    inset 0 0 0 3px rgba(255,255,255,.98),
+    0 0 0 3px rgba(26,22,18,.22);
+}
+
+/* ── RIGHT: DETAIL PANEL ──────────────────────────────── */
+.detail-panel {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  min-height: 0;
+}
+
+.detail-head {
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.detail-head h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 17px;
+  letter-spacing: -.01em;
+}
+.view-toggle {
+  display: flex;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 600;
+}
+.vt-btn {
+  padding: 5px 12px;
+  background: white;
+  border: none;
+  color: var(--ink2);
+  cursor: pointer;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  border-right: 1px solid var(--rule);
+  transition: background .12s;
+}
+.vt-btn:last-child { border-right: none; }
+.vt-btn.active { background: var(--ink); color: white; }
+
+.detail-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 22px 24px 32px;
+}
+
+/* ── DETAIL CARD COMPONENTS ───────────────────────────── */
+.dc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.dc-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 26px;
+  letter-spacing: -.03em;
+  line-height: 1.05;
+}
+.dc-system {
+  font-size: 11px;
+  color: var(--ink2);
+  margin-top: 4px;
+  font-family: 'DM Mono', monospace;
+}
+.dc-weight-pill {
+  flex: 0 0 auto;
+  border: 1.5px solid var(--rule);
+  border-radius: 6px;
+  padding: 10px 14px;
+  text-align: right;
+  background: var(--cream);
+}
+.dc-weight-pill .wnum {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  letter-spacing: -.04em;
+  line-height: 1;
+}
+.dc-weight-pill .wlbl {
+  font-size: 10px;
+  color: var(--ink2);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  display: block;
+  margin-top: 2px;
+}
+
+.dc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.ctag-pill {
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid;
+}
+.ctag-pill.research    { color:var(--c-research);  border-color:var(--c-research);  background:var(--c-research-bg); }
+.ctag-pill.teaching    { color:var(--c-teaching);  border-color:var(--c-teaching);  background:var(--c-teaching-bg); }
+.ctag-pill.prestige    { color:var(--c-prestige);  border-color:var(--c-prestige);  background:var(--c-prestige-bg); }
+.ctag-pill.employ      { color:var(--c-employ);    border-color:var(--c-employ);    background:var(--c-employ-bg); }
+.ctag-pill.intl        { color:var(--c-intl);      border-color:var(--c-intl);      background:var(--c-intl-bg); }
+.ctag-pill.industry    { color:var(--c-industry);  border-color:var(--c-industry);  background:var(--c-industry-bg); }
+.ctag-pill.other       { color:var(--c-other);     border-color:rgba(58,58,58,.35); background:var(--c-other-bg); }
+.ctag-pill.zero        { color:var(--c-zero);      border-color:rgba(136,136,136,.35); background:var(--c-zero-bg); font-style:italic; }
+
+.dc-section {
+  margin-bottom: 14px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.dc-section-head {
+  background: var(--cream);
+  padding: 7px 14px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink2);
+  border-bottom: 1px solid var(--rule);
+}
+.dc-section-body {
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+.dc-section-body p { margin-bottom: 8px; }
+.dc-section-body p:last-child { margin-bottom: 0; }
+
+/* formula block */
+.formula-block {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  background: #f8f5ef;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 14px 16px;
+  line-height: 2;
+  overflow-x: auto;
+}
+.f-line { display: block; padding: 2px 0; }
+.f-line.sub { padding-left: 20px; color: var(--ink2); font-size: 11px; }
+.f-sep { display: block; height: 1px; background: var(--rule); margin: 8px 0; }
+
+/* rules list */
+.rule-list { list-style: none; }
+.rule-list li {
+  padding: 7px 0;
+  border-bottom: 1px solid var(--rule2);
+  font-size: 13px;
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+.rule-list li:last-child { border-bottom: none; }
+.rule-key {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--ink2);
+  padding-top: 2px;
+  font-family: 'DM Mono', monospace;
+}
+
+/* caveats / accuracy flags */
+.caveat {
+  background: #fff8e8;
+  border: 1px solid #e8d08a;
+  border-radius: 5px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #5a4000;
+  margin-bottom: 14px;
+  line-height: 1.55;
+}
+.caveat strong { font-weight: 700; }
+.caveat-warn {
+  background: #fff0f0;
+  border: 1px solid #e8a0a0;
+  color: #5a0000;
+}
+
+/* data source badge */
+.src-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--parchment);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink2);
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+
+/* indicator grid (for multi-indicator breakdown) */
+.indicator-grid {
+  display: grid;
+  gap: 8px;
+}
+.ind-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--rule2);
+  font-size: 12.5px;
+}
+.ind-row:last-child { border-bottom: none; }
+.ind-name { font-weight: 500; }
+.ind-wt {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--ink2);
+  text-align: right;
+  white-space: nowrap;
+}
+.ind-concepts { display: flex; gap: 4px; }
+.ind-ctag {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.ind-row.zero-wt .ind-name { color: var(--ink2); font-style: italic; }
+.ind-row.zero-wt .ind-wt   { color: var(--c-zero); }
+
+/* normalisation badge */
+.norm-badge {
+  display: inline-block;
+  background: var(--parchment);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 2px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink2);
+  margin-right: 5px;
+}
+
+/* Normalisation grid: 2x2 table matching label/value styles */
+.norm-grid { width: 100%; border-collapse: collapse; margin-top: 6px; }
+.norm-grid td { vertical-align: middle; padding: 6px 8px; }
+.norm-grid .norm-value { color: var(--ink2); font-size: 13px; }
+.norm-input {
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--ink2);
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 6px 8px;
+  min-width: 220px;
+}
+
+.footnote {
+  font-size: 11.5px;
+  color: var(--ink2);
+  margin-top: 18px;
+  border-top: 1px solid var(--rule);
+  padding-top: 12px;
+  line-height: 1.6;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 1000px) {
+  .shell { grid-template-columns: 1fr; }
+  .detail-panel { border-top: 2px solid var(--ink); }
+  .masthead { padding: 20px 20px 16px; grid-template-columns: 1fr; }
+  .masthead-meta { text-align: left; border-left: none; border-top: 1px solid var(--rule); padding-left: 0; padding-top: 12px; }
+  .bars-area { min-height: 520px; }
+  .stack { min-height: 440px; }
+  .accuracy-bar { padding: 8px 20px; }
+  .matrix-panel, .detail-body, .panel-header, .concept-strip { padding-left: 16px; padding-right: 16px; }
+  .col-head { padding: 10px 10px 8px; }
+}
+@media (max-width: 640px) {
+  .bars-area { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     MASTHEAD
+═══════════════════════════════════════════════════════ -->
+<header class="masthead">
+  <div class="masthead-left">
+    <div class="eyebrow">Methodology Comparator · River's 2026 May Pilot Edition</div>
+    <h1>University Ranking<br>Methodology Matrix</h1>
+    <p class="masthead-sub">
+      Categories and data sources breakdown of the major university rankings, ARWU, QS and THE WUR.
+  </div>
+  <div class="masthead-meta">
+    <strong>ARWU 2025</strong> · ShanghaiRanking Consultancy<br>
+    Bibliometrics via Clarivate / Web of Science<br><br>
+    <strong>QS WUR</strong> · QS Quacquarelli Symonds<br>
+    Citations via Elsevier<br><br>
+    <strong>THE WUR 2026</strong> · Times Higher Education<br>
+    Bibliometrics &amp; normalisation via Elsevier/Scopus
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════
+     ACCURACY NOTICE BAR
+═══════════════════════════════════════════════════════ -->
+<div class="accuracy-bar">
+  <span class="ab-tag">Key Features</span>
+  <span class="ab-item">Explore <strong>similarities</strong> at the left weight matrix panel </span>
+  <span class="ab-item">Examine indicators' <strong>detailed descriptions</strong> at the right panel</span>
+  <span class="ab-item">Both "overview" and "technical" views available for each indicator</span>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SHELL
+═══════════════════════════════════════════════════════ -->
+<div class="shell">
+
+  <!-- ── LEFT: MATRIX ─────────────────────────────────── -->
+  <section class="matrix-panel">
+
+    <div class="panel-header">
+      <div>
+        <h2>Weight Matrix</h2>
+      
+      </div>
+    </div>
+
+    <!-- concept tabs -->
+    <div class="concept-strip">
+  <div class="concept-label">Link by data source</div>
+  <div class="concept-tabs" id="conceptTabs">
+    <button class="ctab active" data-c="all">All</button>
+    <button class="ctab" data-c="reputation_survey">Reputation Survey</button>
+    <button class="ctab" data-c="university_submission">University Submission</button>
+    <button class="ctab" data-c="bibliometrics_database">Bibliometrics Database</button>
+    <button class="ctab" data-c="third_party">Third-Party</button>
+  </div>
+</div>
+
+    <!-- bars -->
+    <div class="bars-area" id="barsArea"></div>
+
+  </section>
+
+  <!-- ── RIGHT: DETAIL ─────────────────────────────────── -->
+  <aside class="detail-panel">
+    <div class="detail-head">
+      <div>
+        <h2>Indicator Detail</h2>
+        <p style="font-size:11.5px;color:var(--ink2);">
+          Switch between "overview" and "technical" views on the right hand buttons
+        </p>
+      </div>
+      <div class="view-toggle">
+        <button class="vt-btn active" id="btnTags">Overview</button>
+        <button class="vt-btn"        id="btnFormal">Technical</button>
+      </div>
+    </div>
+    <div class="detail-body" id="detailBody"></div>
+  </aside>
+
+</div><!-- /shell -->
+
+<!-- ══════════════════════════════════════════════════════
+     DATA + SCRIPT
+═══════════════════════════════════════════════════════ -->
+<script>
+/* ── CONCEPT COLOURS (dot markers) ─────────────────────── */
+const CC = {
+  research: '#1a3a5c',
+  teaching: '#2d5a27',
+  prestige: '#6b2d00',
+  employ:   '#7a1f2e',
+  intl:     '#0f4a4a',
+  industry: '#4a3000',
+  other:    '#5a5a5a',
+  zero:     '#aaaaaa',
+};
+
+/* ── RANKING DATA ───────────────────────────────────────── */
+const RANKINGS = [
+  {
+    id: 'arwu', name: 'ARWU', sub: '6 indicators · ShanghaiRanking 2025',
+   segs: [
+  { key:'award',  label:'Award',    wt:20, color:'#1F3A5F', concepts:['prestige','research'],
+    zero:false },
+  { key:'hici',   label:'HiCi',     wt:20, color:'#2E4F73', concepts:['research'],
+    zero:false },
+  { key:'ns',     label:'N&S',      wt:20, color:'#4F6D8A', concepts:['research'],
+    zero:false },
+  { key:'pub',    label:'PUB',      wt:20, color:'#AFC3D6', concepts:['research'],
+    zero:false },
+  { key:'alumni', label:'Alumni',   wt:10, color:'#5A3E6B', concepts:['prestige','teaching'],
+    zero:false },
+  { key:'pcp',    label:'PCP',      wt:10, color:' #4A4F55', concepts:['other'],
+    zero:false },
+]
+  },
+  {
+    id: 'qs', name: 'QS', sub: '5 lenses · 11 indicators · QS WUR 2026',
+    segs: [
+      { key:'res',    label:'Research & Discovery',       wt:50, color:'#1F3A5F', concepts:['research','prestige'],
+        zero:false },
+      { key:'emp',    label:'Employability & Outcomes',   wt:20, color:'#D79A4A', concepts:['employ'],
+        zero:false },
+      { key:'glob',   label:'Global Engagement',          wt:15, color:'#0F5C5C', concepts:['intl','other'],
+        zero:false },
+      { key:'learn',  label:'Learning Experience',        wt:10, color:'#C7AFC3', concepts:['teaching'],
+        zero:false },
+      { key:'sus',    label:'Sustainability',             wt:5,  color:'#B9C7A6', concepts:['other'],
+        zero:false },
+    ]
+  },
+  {
+    id: 'the', name: 'THE', sub: '5 pillars · 18 metrics · THE WUR 2026',
+    segs: [
+      { key:'rq',     label:'Research Quality',       wt:30,   color:'#4F6D8A', concepts:['research'],
+        zero:false },
+      { key:'re',     label:'Research Environment',   wt:29,   color:'#5e747f', concepts:['research','prestige'],
+        zero:false },
+      { key:'teach',  label:'Teaching',               wt:29.5, color:'#B48EAE', concepts:['teaching','prestige'],
+        zero:false },
+      { key:'intl',   label:'International Outlook',  wt:7.5,  color:'#6FA8A3', concepts:['intl'],
+        zero:false },
+      { key:'ind',    label:'Industry',               wt:4,    color:'#E6C38A', concepts:['industry'],
+        zero:false },
+    ]
+  }
+];
+
+/* ── DETAIL CARD DATA ───────────────────────────────────── */
+
+  /* ════ ARWU ════ */
+  const DETAILS = {
+  /* ════ ARWU ════ */
+  'arwu:alumni': {
+    title: 'Alumni', system:'ARWU', weight:10, view:'Indicator',
+    concepts: ['prestige','teaching'],
+    sources: ['Nobel Foundation','Fields Medal Committee'],
+    purpose: 'Counts Nobel Prizes and Fields Medals won by an institution\'s alumni. Alumni are defined as those who obtained bachelor\'s, master\'s, or doctoral degrees from the institution.',
+    normMethod: 'Max-ratio (highest raw value = 100; others = % of top)',
+    normExample: 'If the highest Raw Alumni value globally is 50 and University X has 20, then Alumni Score = 100 × 20 / 50 = 40. Its final ARWU contribution is 10% × 40 = 4.',
+    caveats: [],
+    // ... rest of alumni properties
+    formula: [
+      'Raw Alumni = Σⱼ (LaureateCredit_j × TimeDecay_j)',
+      'Alumni Score = 100 × (Raw Alumni / Highest Raw Alumni)',
+      'Contribution = 10% × Alumni Score',
+    ],
+    indicators: null,
+    rules: [
+      ['Eligibility','Counts bachelor\'s, master\'s, and doctoral degrees from the institution.'],
+      ['Deduplication','If a person holds multiple degrees from one institution, the institution is counted once only.'],
+      ['Time decay','100% for degrees after 2011; 90% for 2001–2010; 80% for 1991–2000; continuing down by decade; floor 10% at 1921–1930.'],
+      ['Data source','Nobel Foundation laureate records; Fields Medal Committee records.'],
+    ],
+  },
+  'arwu:award': {
+    title: 'Award', system:'ARWU', weight:20, view:'Indicator',
+    // ... previous properties ...
+    concepts: ['prestige','research'],
+    sources: ['Nobel','Fields Medal'],
+    purpose: 'Counts Nobel Prizes (Physics, Chemistry, Medicine, Economics) and Fields Medals (Mathematics) won by current or former staff, counted at their affiliated institution at the time of winning.',
+    normMethod: 'Max-ratio (highest raw value = 100)',
+    normExample: 'If the highest Raw Award value is 40 and University X has 10, then Award Score = 100 × 10 / 40 = 25. Its final ARWU contribution is 20% × 25 = 5.',
+    caveats: [
+    // ... rest of award properties
+      {type:'info', text:'Time-decay schedule differs from Alumni: Award floor is 10% at 1931–1940; Alumni floor is 10% at 1921–1930.'}
+    ],
+    formula: [
+      'Raw Award = Σⱼ (PrizeShare_j × AffiliationShare_j × TimeDecay_j)',
+      'Award Score = 100 × (Raw Award / Highest Raw Award)',
+      'Contribution = 20% × Award Score',
+    ],
+    indicators: null,
+    rules: [
+      ['Staff definition','Counted based on affiliation at time of winning, not current employment.'],
+      ['Prize split','If a Nobel Prize is shared, winners receive credit proportional to prize share.'],
+      ['Affiliation split','If a winner held multiple affiliations, credit divided equally: 1 ÷ n institutions.'],
+      ['Time decay','100% after 2021; 90% for 2011–2020; 80% for 2001–2010; 70% for 1991–2000; floor 10% at 1931–1940.'],
+      ['Data source','http://www.nobelprize.org/; http://www.mathunion.org/'],
+    ],
+  },
+  'arwu:hici': {
+    title: 'HiCi — Highly Cited Researchers', system:'ARWU', weight:20, view:'Indicator',
+    // ... previous properties ...
+    concepts: ['research'],
+    sources: ['Clarivate / Web of Science'],
+    purpose: 'Counts Highly Cited Researchers (HCR) as defined by Clarivate\'s annual HCR list, based on the number of papers falling in the top 1% by citations for their subject field and year.',
+    normMethod: 'Max-ratio (highest raw count = 100)',
+    normExample: 'If the top university has 120 Highly Cited Researchers and University X has 30, then HiCi Score = 100 × 30 / 120 = 25. Its final ARWU contribution is 20% × 25 = 5.',
+    caveats: [
+    // ... rest of hici properties
+      {type:'info', text:'Data source: Clarivate\'s Highly Cited Researchers list issued November 2024 (used for ARWU 2025). Only primary affiliations are counted.'}
+    ],
+    formula: [
+      'Raw HiCi = Σⱼ PrimaryFieldCredit_j',
+      'HiCi Score = 100 × (Raw HiCi / Highest Raw HiCi)',
+      'Contribution = 20% × HiCi Score',
+    ],
+    indicators: null,
+    rules: [
+      ['Primary only','Only primary institutional affiliations are considered; secondary affiliations excluded.'],
+      ['Multi-field','If a researcher appears in multiple ESI fields, each field is counted separately.'],
+      ['Reference list','ARWU 2025 uses the Clarivate HCR list issued November 2024.'],
+      ['Data source','Clarivate Analytics / Web of Science.'],
+    ],
+  },
+  'arwu:ns': {
+    title: 'N&S — Nature & Science Articles', system:'ARWU', weight:20, view:'Indicator',
+    concepts: ['research'],
+    sources: ['WoS'],
+    purpose: 'Counts Article-type publications in Nature and Science (2020–2024), weighted by authorship role and affiliation order.',
+    normMethod: 'Max-ratio (highest weighted article credit = 100)',
+    normExample: 'If the highest Raw N&S credit is 80 and University X has 40, then N&S Score = 100 × 40 / 80 = 50. Its final ARWU contribution is 20% × 50 = 10.',
+    caveats: [
+    // ... rest of ns properties
+      {type:'warn', text:'Institutions specialised in humanities and social sciences (e.g. London School of Economics) have N&S excluded and its 20% weight redistributed to other indicators.'}
+    ],
+    formula: [
+      'ArticleCredit = 1.00×Corresponding + 0.50×First + 0.25×Next + 0.10×Other',
+      'Raw N&S = Σₐ ArticleCredit_a',
+      'N&S Score = 100 × (Raw N&S / Highest Raw N&S)',
+      'Contribution = 20% × N&S Score',
+    ],
+    indicators: null,
+    rules: [
+      ['Time window','Articles published 2020–2024 only.'],
+      ['Article type','Only "Article"-type publications; reviews and letters excluded.'],
+      ['Author order','Corresponding = 1.00; First = 0.50; Next = 0.25; Other = 0.10.'],
+      ['Address order','When multiple corresponding addresses exist, first address = corresponding; others follow address order as first, next, etc.'],
+      ['Humanities exception','N&S excluded for arts/humanities/social-science-specialised institutions; weight redistributed.'],
+    ],
+  },
+  'arwu:pub': {
+    title: 'PUB — Publications', system:'ARWU', weight:20, view:'Indicator',
+    // ... previous properties ...
+    concepts: ['research'],
+    sources: ['Clarivate / Web of Science (SCIE + SSCI)'],
+    purpose: 'Counts Article-type papers indexed in SCIE and SSCI in a single reference year (2024). SSCI articles receive double weight to recognise social science outputs.',
+    normMethod: 'Max-ratio (highest weighted publication count = 100)',
+    normExample: 'If the top institution produces 20,000 weighted publications and University X has 5,000, then PUB Score = 100 × 5,000 / 20,000 = 25. Its final ARWU contribution is 20% × 25 = 5.',
+    caveats: [
+    // ... rest of pub properties
+      {type:'info', text:'PUB uses a single year window (2024 only), unlike N&S which spans 2020–2024. This is a key methodological distinction frequently overlooked in comparisons.'}
+    ],
+    formula: [
+      'Raw PUB = SCIE_Articles + 2 × SSCI_Articles',
+      'PUB Score = 100 × (Raw PUB / Highest Raw PUB)',
+      'Contribution = 20% × PUB Score',
+    ],
+    indicators: null,
+    rules: [
+      ['Index sources','Science Citation Index-Expanded (SCIE) and Social Sciences Citation Index (SSCI) via Web of Science.'],
+      ['Article type','Only "Article"-type publications counted; reviews/letters excluded.'],
+      ['SSCI multiplier','Each SSCI article is weighted as 2 to give social sciences comparable visibility.'],
+      ['Year window','Single year: papers indexed in 2024 only (not a rolling multi-year window).'],
+      ['Data source','Clarivate Analytics / Web of Science.'],
+    ],
+  },
+  'arwu:pcp': {
+    title: 'PCP — Per Capita Performance', system:'ARWU', weight:10, view:'Indicator',
+     concepts: ['other'],
+    sources: ['ShanghaiRanking (derived from other indicators + national staff data)'],
+    purpose: 'Measures institutional efficiency by dividing the weighted sum of the five other ARWU indicator scores by the number of full-time equivalent (FTE) academic staff.',
+    normMethod: 'Max-ratio (highest per-capita score = 100)',
+    normExample: 'If the highest per-capita performance ratio is 3.0 and University X has 1.5, then PCP Score = 100 × 1.5 / 3.0 = 50. Its final ARWU contribution is 10% × 50 = 5.',
+    caveats: [
+    // ... rest of pcp properties
+      {type:'info', text:'If FTE academic staff data cannot be obtained for a country, ARWU substitutes the average staff count for all Top 1000 universities. This introduces a known estimation artefact for institutions in data-sparse countries.'}
+    ],
+    formula: [
+      'WeightedFive = 0.10×Alumni + 0.20×Award + 0.20×HiCi + 0.20×N&S + 0.20×PUB',
+      'Raw PCP = WeightedFive / FTE_Academic_Staff',
+      'PCP Score = 100 × (Raw PCP / Highest Raw PCP)',
+      'Contribution = 10% × PCP Score',
+    ],
+    indicators: null,
+    rules: [
+      ['Denominator','Full-time equivalent academic staff from national higher education data.'],
+      ['Staff fallback','If country-level FTE data is unavailable, the average of Top 1000 institutions is substituted.'],
+      ['Countries covered','USA, UK, China, France, Germany, Canada, Japan, Italy, Australia, Netherlands, Sweden, Switzerland, Belgium, South Korea, Czechia, New Zealand, Saudi Arabia, Spain, Austria, Norway, Poland, Israel, and others.'],
+    ],
+  },
+
+  /* ════ QS ════ */
+  'qs:res': {
+    title: 'Research & Discovery', system:'QS', weight:50, view:'Lens',
+    concepts: ['research','prestige'],
+    sources: ['QS Academic Reputation Survey (self-administered)','Elsevier (citations data)'],
+    purpose: 'Measures research quality, citation impact, and academic reputation. The largest QS lens by weight, combining peer-reputation survey data with bibliometric citation intensity.',
+    normMethod: 'QS proprietary scoring (indicator-level; full transform not published)',
+    caveats: [],
+    formula: [
+      'Lens Contribution = 30% × Academic_Reputation + 20% × Citations_per_Faculty',
+      'Lens Weight = 50%',
+    ],
+    indicators: [
+      { name:'Academic Reputation', wt:'30%', concepts:['prestige','research'], note:'Survey nominations from academics globally.' },
+      { name:'Citations per Faculty', wt:'20%', concepts:['research'], note:'Total citation count divided by faculty size.' },
+    ],
+    rules: [
+      ['Academic Reputation','Nominations from 151,000+ academics; respondents nominate institutions for teaching and/or research.'],
+      ['Citations per Faculty','Captures citation volume relative to academic staff. Data provided by Elsevier.'],
+    ],
+  },
+  'qs:emp': {
+    title: 'Employability & Outcomes', system:'QS', weight:20, view:'Lens',
+    concepts: ['employ'],
+    sources: ['QS Employer Reputation Survey','QS Employment Outcomes data'],
+    purpose: 'Measures graduate employability through employer reputation surveys and graduate employment outcome data.',
+    normMethod: 'QS proprietary scoring',
+    caveats: [],
+    formula: [
+      'Lens Contribution = 15% × Employer_Reputation + 5% × Employment_Outcomes',
+      'Lens Weight = 20%',
+    ],
+    indicators: [
+      { name:'Employer Reputation', wt:'15%', concepts:['employ'], note:'Survey of 100,000+ employers globally.' },
+      { name:'Employment Outcomes', wt:'5%', concepts:['employ'], note:'Graduate employability and career impact metrics.' },
+    ],
+    rules: [
+      ['Employer Reputation','100,000+ employer responses nominating institutions for graduate quality.'],
+      ['Employment Outcomes','Measures graduates\' ability to obtain employment and their career trajectory impact.'],
+    ],
+  },
+  'qs:glob': {
+    title: 'Global Engagement', system:'QS', weight:15, view:'Lens',
+    concepts: ['intl','other'],
+    sources: ['Institutions (self-submitted)','Elsevier (IRN)'],
+    purpose: 'Measures internationalisation through international staff, student body, research networks, exchange participation, and web impact. Contains six indicators including two with 0% weight in the overall ranking.',
+    normMethod: 'QS proprietary scoring per indicator',
+    caveats: [
+      {type:'warn', text:'The QS methodology document lists 6 indicators under this lens: IFR, IRN, ISD, ISR and Exchange Ratios. ISD is listed at 0%.'}
+    ],
+    formula: [
+      'Lens Contribution = 5%×IFR + 5%×IRN + 0%×ISD + 5%×ISR + [Exchange Ratios]',
+      'Lens Weight = 15%',
+    ],
+    indicators: [
+      { name:'International Faculty Ratio (IFR)', wt:'5%', concepts:['intl'], note:'International faculty as proportion of total faculty.' },
+      { name:'International Research Network (IRN)', wt:'5%', concepts:['intl'], note:'Diversity and sustainability of international research partnerships.' },
+      { name:'International Student Diversity (ISD)', wt:'0%', concepts:['zero'], note:'Ratio + nationality diversity of international students. Zero weight in overall ranking.' },
+      { name:'International Student Ratio (ISR)', wt:'5%', concepts:['intl'], note:'International students as proportion of total student body.' },
+      { name:'Inbound & Outbound Exchange Ratios', wt:'[undisclosed]', concepts:['intl'], note:'Measures both incoming and outgoing exchange student participation.' },
+    ],
+    rules: [
+      ['IFR','International faculty staff / total faculty staff.'],
+      ['IRN','Number of countries represented in research partnerships, weighted by renewal.'],
+      ['ISD','Ratio of international students PLUS diversity of nationalities. Listed at 0% weight in the published weight table.'],
+      ['ISR','International students / total students (undergrad + postgrad).'],
+      ['Exchange Ratios','Inbound: foreign students attending on exchange for ≥1 semester. Outbound: home students attending foreign institutions for ≥1 semester.'],
+    ],
+  },
+  'qs:learn': {
+    title: 'Learning Experience', system:'QS', weight:10, view:'Lens',
+    concepts: ['teaching'],
+    sources: ['Institutions (self-submitted)'],
+    purpose: 'Reflects the learning environment through academic staff-student ratio and the proportion of faculty holding doctoral degrees. Contains two indicators; the individual weight split is not publicly disclosed in the methodology document.',
+    normMethod: 'QS proprietary scoring',
+    caveats: [
+      {type:'warn', text:'The QS methodology document lists both Faculty-Student Ratio (FSR) and Staff with PhD (SWP) under this lens. The individual weight split between FSR and SWP is not disclosed. Representing this lens as FSR alone (as done in many secondary sources) is inaccurate.'}
+    ],
+    formula: [
+      'Lens Contribution = [FSR weight] × FSR_Score + [SWP weight] × SWP_Score',
+      'Lens Weight = 10%',
+    ],
+    indicators: [
+      { name:'Faculty-Student Ratio (FSR)', wt:'[partial]', concepts:['teaching'], note:'Faculty staff count divided by total students.' },
+      { name:'Staff with PhD (SWP)', wt:'[partial]', concepts:['teaching'], note:'Proportion of faculty holding a PhD or equivalent terminal degree.' },
+    ],
+    rules: [
+      ['FSR','Calculated by dividing number of faculty staff by number of students.'],
+      ['SWP','Simple proportion of faculty staff holding a PhD or equivalent terminal degree.'],
+      ['Weight split','The QS methodology document does not disclose how the 10% is split between FSR and SWP.'],
+    ],
+  },
+  'qs:sus': {
+    title: 'Sustainability', system:'QS', weight:5, view:'Lens',
+    concepts: ['other'],
+    sources: ['QS Sustainability data collection'],
+    purpose: 'Single-indicator lens measuring institutional commitment to environmental, social, and governance (ESG) factors, including research impact across the UN\'s 17 Sustainable Development Goals (SDGs).',
+    normMethod: 'QS proprietary scoring',
+    caveats: [],
+    formula: [
+      'Lens Contribution = 5% × Sustainability_Score',
+      'Lens Weight = 5%',
+    ],
+    indicators: [
+      { name:'Sustainability', wt:'5%', concepts:['other'], note:'Composite ESG score covering environment, social, governance, and SDG research impact.' },
+    ],
+    rules: [
+      ['ESG scope','Environmental projects, diversity initiatives, institutional governance.'],
+      ['SDG impact','Includes academic research impact across UN\'s 17 SDGs.'],
+      ['QS note','QS describes itself as the first major ranking provider to include sustainability as a core indicator.'],
+    ],
+  },
+
+  /* ════ THE ════ */
+  'the:rq': {
+    title: 'Research Quality', system:'THE', weight:30, view:'Pillar',
+    concepts: ['research'],
+    sources: ['Elsevier / Scopus (all four metrics)'],
+    purpose: 'Measures research impact quality through four citation-based bibliometric measures, all calculated from Elsevier\'s Scopus database covering publications 2020–2024 with citations collected through 2025.',
+    normMethod: 'Distribution-based standardisation (Z-score variant); Research Excellence, Research Influence use exponential component',
+    caveats: [
+      {type:'info', text:'From WUR 2026, Citation Impact is calculated by Elsevier (previously by THE from 2024, and by Elsevier before that). All four metrics in this pillar use Scopus data; THE does not independently collect the underlying bibliometric data.'}
+    ],
+    formula: [
+      'Pillar = 15%×Citation_Impact + 5%×Research_Strength + 5%×Research_Excellence + 5%×Research_Influence',
+      'Total Pillar Weight = 30%',
+    ],
+    indicators: [
+      { name:'Citation Impact (FWCI)', wt:'15%', concepts:['research'], note:'Arithmetic mean FWCI of eligible publications. Blends country-adjusted and unadjusted measures. Calculated by Elsevier from WUR 2026.' },
+      { name:'Research Strength', wt:'5%', concepts:['research'], note:'75th percentile FWCI of all institutional publications. Less susceptible to extremely high-FWCI outliers.' },
+      { name:'Research Excellence', wt:'5%', concepts:['research'], note:'Count of publications in the top 10% by FWCI globally, normalised by year, subject, and staff size.' },
+      { name:'Research Influence', wt:'5%', concepts:['research'], note:'Measures "thought leadership" — the importance of publications citing the institution\'s work (PageRank-type logic). Calculated by THE.' },
+    ],
+    rules: [
+      ['FWCI baseline','FWCI = 1.00 equals the global average across all publications in the same year, type, and discipline.'],
+      ['Kilo-author rule','Papers with 1,000+ authors use fractional counting; every contributing institution receives ≥5% of the paper\'s value.'],
+      ['Publication window','All Scopus-indexed publications 2020–2024; citations collected 2020–2025.'],
+      ['Normalisation exceptions','Research Excellence and Research Influence use an exponential component rather than Z-scoring, due to their data distributions.'],
+    ],
+  },
+  'the:re': {
+    title: 'Research Environment', system:'THE', weight:29, view:'Pillar',
+    concepts: ['research','prestige'],
+    sources: ['THE Academic Reputation Survey','Institutions (self-submitted, PPP-adjusted)','Elsevier/Scopus (productivity)'],
+    purpose: 'Measures the scale, funding, reputation, and productivity of an institution\'s research environment. Combines a survey-based reputation metric (18%) with income and productivity data (5.5% each).',
+    normMethod: 'Z-score variant for income and productivity; logarithmic function for reputation (non-zero values only)',
+    caveats: [
+      {type:'info', text:'Research Reputation (18%) is the single largest individual metric in the entire THE ranking. Survey results combine two years of data (2024 + 2025 surveys). A self-voting cap (10% max) and vote-concentration adjustment have been applied since WUR 2025.'}
+    ],
+    formula: [
+      'Pillar = 18%×Research_Reputation + 5.5%×Research_Income + 5.5%×Research_Productivity',
+      'Total Pillar Weight = 29%',
+    ],
+    indicators: [
+      { name:'Research Reputation', wt:'18%', concepts:['prestige','research'], note:'Survey votes from academics (2024 + 2025 surveys combined). Weighted by country and subject. Logarithmic standardisation.' },
+      { name:'Research Income', wt:'5.5%', concepts:['research'], note:'Total subject-weighted research income (PPP-adjusted) per subject-weighted academic staff. Converted to USD via World Bank PPP.' },
+      { name:'Research Productivity', wt:'5.5%', concepts:['research'], note:'Subject-weighted Scopus publications per combined FTE research + academic staff. Papers in staffless subjects reassigned proportionally (≤10% cap).' },
+    ],
+    rules: [
+      ['Survey scale','108,000+ responses for THE WUR 2026 across 2024 and 2025 survey rounds.'],
+      ['Self-vote cap','Reduced to 10% of total votes for any university since WUR 2023.'],
+      ['Vote concentration','High votes-per-respondent-institution (VPRI) ratio triggers dilution since WUR 2025.'],
+      ['PPP conversion','Research income converted to USD using World Bank Purchasing Power Parity data.'],
+    ],
+  },
+  'the:teach': {
+    title: 'Teaching', system:'THE', weight:29.5, view:'Pillar',
+    concepts: ['teaching','prestige'],
+    sources: ['THE Academic Reputation Survey','Institutions (self-submitted)','HESA/JISC (UK only)'],
+    purpose: 'Measures the learning environment through five metrics: teaching reputation, staffing ratios, doctoral training intensity, and institutional income as a resource proxy.',
+    normMethod: 'Z-score variant for most metrics; logarithmic for Teaching Reputation',
+    caveats: [],
+    formula: [
+      'Pillar = 15%×Teaching_Rep + 4.5%×SSR + 2%×DocBach + 5.5%×DocStaff + 2.5%×InstIncome',
+      'Total Pillar Weight = 29.5%',
+    ],
+    indicators: [
+      { name:'Teaching Reputation', wt:'15%', concepts:['prestige','teaching'], note:'Teaching-specific votes from THE Academic Reputation Survey (2024+2025). Logarithmic standardisation.' },
+      { name:'Student-Staff Ratio (SSR)', wt:'4.5%', concepts:['teaching'], note:'FTE academic staff divided by FTE students across all programmes and years.' },
+      { name:'Doctorate-Bachelor Ratio', wt:'2%', concepts:['teaching'], note:'Doctorates awarded / undergraduate degrees awarded.' },
+      { name:'Doctorate-Staff Ratio', wt:'5.5%', concepts:['teaching'], note:'Subject-weighted doctorates / subject-weighted academic staff. Adjusts for discipline mix.' },
+      { name:'Institutional Income', wt:'2.5%', concepts:['other'], note:'PPP-adjusted institutional income per academic staff — a resource and infrastructure proxy.' },
+    ],
+    rules: [
+      ['UK data','UK institutions use HESA/JISC-supplied data rather than self-submitted portal data.'],
+      ['Doctorate ratios','Both ratios reflect the depth of postgraduate research training and attract high-quality graduates.'],
+      ['Subject weighting','Doctorate-Staff ratio is subject-weighted to reflect that doctoral volumes vary significantly by discipline.'],
+    ],
+  },
+  'the:intl': {
+    title: 'International Outlook', system:'THE', weight:7.5, view:'Pillar',
+    concepts: ['intl'],
+    sources: ['Institutions (self-submitted)','Elsevier/Scopus (co-authorship)','World Bank (population adjustment)'],
+    purpose: 'Measures international diversity of staff, students, and research collaboration. All three active metrics are normalised to account for the effect of country population size. A fourth metric (Studying Abroad) is listed but carries zero weight.',
+    normMethod: 'Z-score variant, with country population-size adjustment',
+    caveats: [
+      {type:'info', text:'Studying Abroad (outbound exchange) is collected and listed in the methodology but carries 0% weight and does not affect the ranking score.'}
+    ],
+    formula: [
+      'Pillar = 2.5%×Int_Students + 2.5%×Int_Staff + 2.5%×Int_CoAuth + 0%×Studying_Abroad',
+      'Total Pillar Weight = 7.5%',
+    ],
+    indicators: [
+      { name:'International Students', wt:'2.5%', concepts:['intl'], note:'International students (nationality ≠ country of institution) as proportion of total FTE students. Country population-adjusted.' },
+      { name:'International Staff', wt:'2.5%', concepts:['intl'], note:'International academic staff as proportion of total FTE academic staff. Country population-adjusted.' },
+      { name:'International Co-authorship', wt:'2.5%', concepts:['intl'], note:'Subject-weighted publications with ≥1 international co-author / total subject-weighted publications. Country population-adjusted.' },
+      { name:'Studying Abroad', wt:'0%', concepts:['zero'], note:'Outbound exchange students / total FTE students. Subject-weighted and population-adjusted. Zero weight in ranking calculation.' },
+    ],
+    rules: [
+      ['Country adjustment','All three active metrics normalised for country population — large countries are not penalised for having fewer international staff/students proportionally.'],
+      ['Co-authorship data','Calculated by Elsevier from Scopus; subject-weighted per institution subject mix.'],
+      ['Studying Abroad','Collected but not used in scoring. Listed at 0% weight.'],
+    ],
+  },
+  'the:ind': {
+    title: 'Industry', system:'THE', weight:4, view:'Pillar',
+    concepts: ['industry'],
+    sources: ['Institutions (self-submitted)','Elsevier/Scopus (patents)','World Bank (PPP)'],
+    purpose: 'Measures knowledge transfer from academic research to industry, through industry research income and patents that cite institutional publications.',
+    normMethod: 'Z-score variant for Industry Income; exponential component for Patents',
+    caveats: [
+      {type:'info', text:'Patents metric uses an exponential normalisation component (like Research Excellence and Research Influence) due to its data distribution. It is subject-weighted and normalised by combined academic + research staff.'}
+    ],
+    formula: [
+      'Pillar = 2%×Industry_Income + 2%×Patents',
+      'Total Pillar Weight = 4%',
+    ],
+    indicators: [
+      { name:'Industry Income', wt:'2%', concepts:['industry'], note:'PPP-adjusted research income from industry per total FTE academic staff.' },
+      { name:'Patents', wt:'2%', concepts:['industry'], note:'Count of patents citing the institution\'s research. Subject-weighted. Normalised by academic + research staff.' },
+    ],
+    rules: [
+      ['Industry Income','Measures willingness of businesses to pay for research — a proxy for institutional commercial relevance.'],
+      ['Patents','Captures citations to university research from patent filings, not raw patent counts. Subject-weighted.'],
+      ['PPP adjustment','Income converted to PPP-scaled USD for cross-country comparability.'],
+      ['Normalisation','Patents uses exponential component (not Z-score) due to heavily right-skewed distribution.'],
+    ],
+  },
+};
+
+/* ── STATE ─────────────────────────────────────────────── */
+let activeTab  = 'all';
+let hoveredSeg = null;   // {rid, key, id} during hover
+let selectedSeg = {rid:'arwu', key:'alumni'};
+let formalMode = false;
+
+/* ── DATA-SOURCE LINKAGE DICTIONARY ─────────────────────── */
+const DATA_SOURCE_LINKAGE = {
+  /* ARWU */
+  'arwu:alumni': ['third_party'],
+  'arwu:award': ['third_party'],
+  'arwu:hici': ['bibliometrics_database'],
+  'arwu:ns': ['bibliometrics_database'],
+  'arwu:pub': ['bibliometrics_database'],
+  'arwu:pcp': ['third_party'],
+
+  /* QS */
+  'qs:res': ['reputation_survey', 'bibliometrics_database'],
+  'qs:emp': ['reputation_survey'],
+  'qs:glob': ['university_submission', 'bibliometrics_database', 'third_party'],
+  'qs:learn': ['university_submission'],
+  'qs:sus': [],
+
+  /* THE */
+  'the:rq': ['bibliometrics_database'],
+  'the:re': ['reputation_survey', 'university_submission', 'bibliometrics_database', 'third_party'],
+  'the:teach': ['reputation_survey', 'university_submission', 'third_party'],
+  'the:intl': ['university_submission', 'bibliometrics_database', 'third_party'],
+  'the:ind': ['university_submission', 'bibliometrics_database', 'third_party'],
+};
+
+/* ── UNIFIED HIGHLIGHT LOGIC ────────────────────────────── */
+function applyHighlight() {
+  const segs = document.querySelectorAll('.seg');
+
+  // Priority 1: A segment is being hovered -> cross-highlight by conceptual themes
+  if (hoveredSeg) {
+    const hoveredEl = document.querySelector(`.seg[data-id="${hoveredSeg.id}"]`);
+    const hoveredConcepts = hoveredEl && hoveredEl.dataset.concepts
+      ? hoveredEl.dataset.concepts.split(',').filter(Boolean)
+      : [];
+
+    segs.forEach(el => {
+      el.classList.remove('dim', 'lit', 'chosen', 'cross-highlight', 'dimmed', 'hovered-seg');
+
+      const thisId = el.dataset.id;
+      const isSelected = (thisId === `${selectedSeg.rid}:${selectedSeg.key}`);
+
+      if (isSelected) el.classList.add('chosen');
+
+      const thisConcepts = el.dataset.concepts ? el.dataset.concepts.split(',').filter(Boolean) : [];
+
+      // Check if they share at least one conceptual tag
+      const sharesConcept = hoveredConcepts.length > 0 && thisConcepts.some(c => hoveredConcepts.includes(c));
+      const selfOnly = hoveredConcepts.length === 0 && thisId === hoveredSeg.id;
+
+      if (thisId === hoveredSeg.id) {
+        el.classList.add('hovered-seg');
+      } else if (sharesConcept || selfOnly) {
+        el.classList.add('cross-highlight');
+      } else {
+        el.classList.add('dimmed');
+      }
+    });
+    return;
+  }
+
+  // Priority 2: Not hovering -> filter by active data-source tab
+  segs.forEach(el => {
+    el.classList.remove('dim', 'lit', 'chosen', 'cross-highlight', 'dimmed', 'hovered-seg');
+    
+    const segId = el.dataset.id;
+    const isSelected = (segId === `${selectedSeg.rid}:${selectedSeg.key}`);
+
+    if (isSelected) el.classList.add('chosen');
+
+    if (activeTab === 'all') {
+      return; // Leave un-dimmed if 'All' is selected
+    }
+
+    const linkedSources = DATA_SOURCE_LINKAGE[segId] || [];
+    if (linkedSources.includes(activeTab)) {
+      el.classList.add('lit');
+    } else {
+      el.classList.add('dim');
+    }
+  });
+}
+
+/* ── BUILD BARS ─────────────────────────────────────────── */
+function buildBars() {
+  const area = document.getElementById('barsArea');
+  area.innerHTML = '';
+  RANKINGS.forEach(r => {
+    const col = document.createElement('div');
+    col.className = 'ranking-col';
+
+    const head = document.createElement('div');
+    head.className = 'col-head';
+    head.innerHTML = `<div class="col-name">${r.name}</div><div class="col-sub">${r.sub}</div>`;
+    col.appendChild(head);
+
+    const stack = document.createElement('div');
+    stack.className = 'stack';
+
+    r.segs.forEach(s => {
+      const btn = document.createElement('button');
+      btn.className = 'seg' + (s.zero ? ' zero-weight' : '');
+      btn.dataset.rid = r.id;
+      btn.dataset.key = s.key;
+      btn.dataset.id = `${r.id}:${s.key}`;
+      btn.dataset.concepts = s.concepts.join(',');
+      btn.dataset.label = s.label;
+      btn.dataset.wt = s.wt;
+      btn.dataset.zero = s.zero ? '1' : '0';
+      btn.style.background = s.color;
+      // proportional height: percentage of 100
+      btn.style.flex = `0 0 ${s.wt}%`;
+
+      // concept dots
+      const dotHTML = s.concepts.map(c =>
+        `<span class="seg-ctag" style="background:${CC[c]||'#888'}"></span>`
+      ).join('');
+
+      btn.innerHTML = `
+        ${s.zero ? '<span class="seg-flag">0%</span>' : ''}
+        <span class="seg-name">${s.label}</span>
+        <span class="seg-wt">${s.wt}%</span>
+        <span class="seg-concepts">${dotHTML}</span>
+      `;
+
+      btn.addEventListener('mouseenter', () => {
+        hoveredSeg = { rid: r.id, key: s.key, id: `${r.id}:${s.key}` };
+        applyHighlight();
+      });
+
+      btn.addEventListener('mouseleave', () => {
+        hoveredSeg = null;
+        applyHighlight();
+      });
+
+      btn.addEventListener('click', () => {
+        selectedSeg = { rid: r.id, key: s.key };
+        applyHighlight();
+        renderDetail();
+      });
+
+      stack.appendChild(btn);
+    });
+    col.appendChild(stack);
+    area.appendChild(col);
+  });
+  applyHighlight();
+}
+
+/* If a segment is very short (small pixel height), switch it to compact layout
+   so the label and its weight sit on one line and remain readable. */
+function adjustCompactSegs() {
+  const segs = document.querySelectorAll('.seg');
+  segs.forEach(el => {
+    // threshold in px: if segment height is less than this, use compact layout
+    const threshold = 44;
+    if (el.offsetHeight < threshold) {
+      el.classList.add('compact');
+      // combine label and weight into single centered string
+      const label = el.dataset.label || el.querySelector('.seg-name')?.textContent || '';
+      const wt = el.dataset.wt || el.querySelector('.seg-wt')?.textContent || '';
+      const flag = el.dataset.zero === '1' ? '<span class="seg-flag">0%</span>' : '';
+      el.innerHTML = `${flag}<span class="seg-compact-text">${label} ${wt}%</span>`;
+    } else {
+      el.classList.remove('compact');
+      // restore original inner structure from dataset
+      const label = el.dataset.label || '';
+      const wt = el.dataset.wt || '';
+      // we don't recreate concept dots here; keep simple restored structure
+      const flag = el.dataset.zero === '1' ? '<span class="seg-flag">0%</span>' : '';
+      el.innerHTML = `${flag}<span class="seg-name">${label}</span><span class="seg-wt">${wt}%</span>`;
+    }
+  });
+}
+
+// debounce helper
+function debounce(fn, wait){
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
+}
+
+window.addEventListener('resize', debounce(() => {
+  adjustCompactSegs();
+}, 120));
+
+/* ── CONCEPT TABS ───────────────────────────────────────── */
+document.getElementById('conceptTabs').addEventListener('click', e => {
+  const btn = e.target.closest('.ctab');
+  if (!btn) return;
+  activeTab = btn.dataset.c;
+  document.querySelectorAll('.ctab').forEach(b => b.classList.toggle('active', b === btn));
+  applyHighlight();
+});
+
+/* ── VIEW TOGGLE ────────────────────────────────────────── */
+document.getElementById('btnTags').addEventListener('click', () => {
+  formalMode = false;
+  document.getElementById('btnTags').classList.add('active');
+  document.getElementById('btnFormal').classList.remove('active');
+  renderDetail();
+});
+document.getElementById('btnFormal').addEventListener('click', () => {
+  formalMode = true;
+  document.getElementById('btnFormal').classList.add('active');
+  document.getElementById('btnTags').classList.remove('active');
+  renderDetail();
+});
+
+/* ── RENDER DETAIL ──────────────────────────────────────── */
+function conceptPill(c) {
+  const labels = {
+    research:'Research', teaching:'Teaching / Learning',
+    prestige:'Prestige / Reputation', employ:'Employability',
+    intl:'International', industry:'Industry',
+    other:'Other', zero:'Zero-weight (listed, not scored)'
+  };
+  return `<span class="ctag-pill ${c}">${labels[c]||c}</span>`;
+}
+
+function renderDetail() {
+  const dKey = `${selectedSeg.rid}:${selectedSeg.key}`;
+  const d = DETAILS[dKey];
+  const body = document.getElementById('detailBody');
+  if (!d) { body.innerHTML = '<p style="color:var(--ink2);font-size:13px">Select an indicator segment.</p>'; return; }
+
+  const tags = (d.concepts || []).map(conceptPill).join('');
+  const sourcesBadges = (d.sources || []).map(s => `<span class="src-badge">⬡ ${s}</span>`).join('');
+
+  const caveatsHTML = (d.caveats || []).map(cav =>
+    `<div class="caveat${cav.type==='warn' ? ' caveat-warn' : ''}"><strong>${cav.type==='warn' ? '⚠ Note:' : 'ⓘ Note:'}</strong> ${cav.text}</div>`
+  ).join('');
+
+  const formulaHTML = (d.formula || []).map(f =>
+    `<span class="f-line">${f}</span>`
+  ).join('<span class="f-sep"></span>');
+
+  const rulesHTML = (d.rules || []).map(([k,v]) =>
+    `<li><span class="rule-key">${k}</span><span>${v}</span></li>`
+  ).join('');
+
+  // Normalisation section: for ARWU show 2x2 table with input, otherwise show single-line method
+  const normSection = d.system === 'ARWU'
+    ? `
+        <table class="norm-grid">
+          <tr>
+            <td><span class="norm-badge">Method</span></td>
+            <td class="norm-value">${d.normMethod}</td>
+          </tr>
+          ${d.normExample ? `
+          <tr>
+            <td><span class="norm-badge">EXAMPLE</span></td>
+            <td class="norm-value">${d.normExample}</td>
+          </tr>` : ''}
+        </table>
+      `
+    : `
+        <p><span class="norm-badge">Method</span>${d.normMethod}</p>
+      `;
+
+  let indicatorsHTML = '';
+  if (d.indicators && d.indicators.length > 0) {
+    indicatorsHTML = `
+      <div class="dc-section">
+        <div class="dc-section-head">Indicator breakdown</div>
+        <div class="dc-section-body">
+          <div class="indicator-grid">
+            ${d.indicators.map(ind => {
+              const dotSpans = (ind.concepts||[]).map(c =>
+                `<span class="ind-ctag" style="background:${CC[c]||'#888'}" title="${c}"></span>`
+              ).join('');
+              const isZero = ind.wt === '0%';
+              return `<div class="ind-row${isZero ? ' zero-wt' : ''}">
+                <div>
+                  <div class="ind-name">${ind.name}${isZero ? ' <em>(zero-weight)</em>':''}</div>
+                  <div style="font-size:11.5px;color:var(--ink2);margin-top:2px">${ind.note}</div>
+                </div>
+                <div class="ind-wt">${ind.wt}</div>
+                <div class="ind-concepts">${dotSpans}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  if (!formalMode) {
+    body.innerHTML = `
+      <div class="dc-top">
+        <div>
+          <div class="dc-title">${d.title}</div>
+          <div class="dc-system">${d.system} · ${d.view} · overview mode</div>
+          <div class="dc-tags">${tags}</div>
+        </div>
+        <div class="dc-weight-pill">
+          <span class="wnum">${d.weight}%</span>
+          <span class="wlbl">${d.system} weight</span>
+        </div>
+      </div>
+      ${caveatsHTML}
+
+      <div class="dc-section">
+        <div class="dc-section-head">Data sources</div>
+        <div class="dc-section-body">${sourcesBadges}</div>
+      </div>
+
+      <div class="dc-section">
+        <div class="dc-section-head">What it measures</div>
+        <div class="dc-section-body"><p>${d.purpose}</p></div>
+      </div>
+
+      ${indicatorsHTML}
+
+      <div class="dc-section">
+        <div class="dc-section-head">Normalisation method</div>
+        <div class="dc-section-body">${normSection}</div>
+      </div>
+
+      <div class="dc-section">
+        <div class="dc-section-head">Rules &amp; constraints</div>
+        <div class="dc-section-body">
+          <ul class="rule-list">${rulesHTML}</ul>
+        </div>
+      </div>
+
+      <div class="footnote">
+        All data sourced from official methodology documents: ARWU 2025 (ShanghaiRanking Consultancy),
+        QS World University Rankings (QS Quacquarelli Symonds), and THE WUR 2026 Methodology
+        (Times Higher Education, signed September 2025). Third-party data providers are attributed per indicator.
+      </div>
+    `;
+  } else {
+    body.innerHTML = `
+      <div class="dc-top">
+        <div>
+          <div class="dc-title">${d.title}</div>
+          <div class="dc-system">${d.system} · ${d.view} · technical mode</div>
+          <div class="dc-tags">${tags}</div>
+        </div>
+        <div class="dc-weight-pill">
+          <span class="wnum">${d.weight}%</span>
+          <span class="wlbl">${d.system} weight</span>
+        </div>
+      </div>
+
+      ${caveatsHTML}
+
+      <div class="dc-section">
+        <div class="dc-section-head">Formula / weight decomposition</div>
+        <div class="dc-section-body">
+          <div class="formula-block">${formulaHTML}</div>
+        </div>
+      </div>
+
+      ${indicatorsHTML}
+
+      <div class="dc-section">
+        <div class="dc-section-head">Normalisation &amp; scaling</div>
+        <div class="dc-section-body">${normSection}</div>
+      </div>
+
+      <div class="dc-section">
+        <div class="dc-section-head">Operational rules</div>
+        <div class="dc-section-body">
+          <ul class="rule-list">${rulesHTML}</ul>
+        </div>
+      </div>
+
+      <div class="dc-section">
+        <div class="dc-section-head">Data sources</div>
+        <div class="dc-section-body">${sourcesBadges}</div>
+      </div>
+    `;
+  }
+}
+
+/* ── INIT ───────────────────────────────────────────────── */
+buildBars();
+adjustCompactSegs();
+renderDetail();
+</script>
+</body>
+</html>
