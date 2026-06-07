@@ -16,3 +16,6 @@ This piece is vibe-coded with Claude Sonnet 4.6, GPT5.5 and Gemini 3.1 Pro Previ
 
 Note:
 If you notice anything that is not accurate or is somehow ambiguous, please leave a message via "Issues". Looking forward to your feedback and happy ranking!
+
+License:
+CC BY-NC-SA. Please do not use it for commercial purposes, and share your modified works under identical terms.
